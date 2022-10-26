@@ -1,0 +1,30 @@
+<head>
+  <link href="css/style.css" rel="stylesheet">
+  <script src="js/script.js" ></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet"> 
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1.0">
+</head>
+<div id='grid' rows="10" cols="10">
+</div>
+<div id="menu">
+</div>
+<div id="display">
+  <span id="bombs"> Bombs left : ?? </span>
+  <span id="cells"> Cells left : ?? </span>
+  
+  <label for="rows">Righe</label>
+  <input type="number" id="rows" name="rows"  max="100" value="10">
+  <label for="cols">Colonne</label>
+  <input type="number" id="cols" name="cols"  max="100" value="10">
+   <label for="dim">Dimensioni celle</label>
+  <input type="number" id="dim" name="dim"  min="20" max="100" value="40">
+  <input type="button" id="save" value="Salva">
+</div>
+
+<div id="tooltip" class="hide">
+  <p id="chooseShovel" class="shovel"></p>
+  <p id="chooseFlag" class="flag"></p>
+</div>
+<div>
