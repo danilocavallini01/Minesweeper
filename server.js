@@ -8,7 +8,16 @@ app.use('/css', express.static(__dirname + '/public/css'));
 app.use('/js', express.static(__dirname + '/public/js'));
 app.use('/images', express.static(__dirname + '/public/images'));
 
-var server = app.listen(80, function(){
-    var port = server.address().port;
-    console.log("Server started at http://localhost:%s", port);
+app.get('/', (req, res) => {
+    res
+      .status(200)
+      .send('Hello server is running')
+      .end();
+  });
+   
+// Start the server
+const PORT = process.env.PORT || 8080;
+    app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}`);
+    console.log('Press Ctrl+C to quit.');
 });
