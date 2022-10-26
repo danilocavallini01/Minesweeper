@@ -7,7 +7,8 @@ window.onload = () => {
   const col_input = document.getElementById("cols");
   const dim_input = document.getElementById("dim");
   const save_configs = document.getElementById("save")
-  const display = document.getElementById("display")
+  const fullScreen = document.getElementById("fullscreen")
+
   const menu = document.getElementById("menu")
   const body = document.body;
 
@@ -18,18 +19,17 @@ window.onload = () => {
   const shovel_input = document.getElementById("chooseShovel")
   const flag_input = document.getElementById("chooseFlag")
 
-  const shovel = "https://cdn-icons-png.flaticon.com/512/1862/1862573.png"
-  const flag = "https://cdn-icons-png.flaticon.com/512/395/395841.png"
-
-  var isTooltiping = false;
+  var isFullScreen = false;
   var target = null;
 
   var map;
   var dim = 40;
   var multiplier = 0.6
-  if ( window.innerWidth < 768.0 ) {
+
+  if (window.innerWidth < 768.0) {
     multiplier = 0.9
   }
+
   var rows = Math.floor(window.innerHeight / dim * multiplier);
   var cols = Math.floor(window.innerWidth / dim * multiplier);
   row_input.value = rows;
@@ -40,15 +40,15 @@ window.onload = () => {
     rows = parseInt(row_input.value)
     cols = parseInt(col_input.value)
     dim = parseInt(dim_input.value)
-    
+
     start()
     hide_display()
   }
 
   menu.onclick = (event) => {
-    if ( isOpenDisplay ) {
+    if (isOpenDisplay) {
       hide_display()
-    }  else {
+    } else {
       show_display()
     }
   }
@@ -59,6 +59,7 @@ window.onload = () => {
   var bombsLeft = 0;
 
   start()
+
 
   function start() {
     document.documentElement.style.setProperty('--rows', rows)
@@ -87,6 +88,19 @@ window.onload = () => {
 
     flag_input.onclick = () => {
       handleInput(true)
+    }
+
+    fullScreen.onclick = () => {
+      var elem = document.documentElement
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen({ navigationUI: "hide" })
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen({ navigationUI: "hide" })
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen({ navigationUI: "hide" })
+      } else if (elem.webkitRequestFullScreen) {
+        elem.webkitRequestFullScreen({ navigationUI: "hide" })
+      }
     }
   }
 
@@ -182,15 +196,53 @@ window.onload = () => {
 
     if (map[row][col] == "b") {
       cell.classList.remove("cover");
-
+      lose()
     } else if (map[row][col] == 0) {
       openRecursive(row, col);
+      cell.classList.remove("cover");
     } else {
       cell.classList.remove("cover");
       needToOpenCells--;
       draw_displays()
     }
 
+  }
+
+  function lose() {
+    var interval = 0;
+    var gap = 2000/(rows * cols);
+
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        if (map[i][j] == 'b') {
+          setTimeout(() => {
+            var cell = document.getElementById(i + "_" + j)
+            cell.classList.remove("cover")
+          }, interval)
+          interval += gap
+        } 
+      }
+    }
+
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        if (map[i][j] != 'b') {
+          setTimeout(() => {
+            var cell = document.getElementById(i + "_" + j)
+            cell.classList.remove("cover")
+          }, interval)
+          interval += gap*2
+        }
+      }
+    }
+
+    quake()
+  }
+
+  function quake() {
+    div.classList.add("apply-shake")
+    body.classList.add("gameover")
+    document.documentElement.classList.add("gameover")
   }
 
   function setFlag(elem) {
@@ -216,6 +268,10 @@ window.onload = () => {
 
     if (!cell.classList.contains("cover")) return;
     cell.classList.remove("cover");
+    if (cell.classList.contains("hint")) {
+      cell.classList.remove("hint")
+    }
+
     needToOpenCells--;
     draw_displays()
 
@@ -247,9 +303,11 @@ window.onload = () => {
     body.classList.remove("hide")
     isOpenDisplay = true;
   }
+
   function moveTooltip(event) {
     var classList = event.target.classList
-    if ( !classList.contains("cover")) {
+    if (!classList.contains("cover") && !classList.contains("flag")) {
+      resetTooltip();
       return;
     }
 

@@ -3,13 +3,44 @@
   --cover: #111;
   --rows: 10;
   --cols: 10;
+  --width: 1920px;
+  --height: 1080px;
   --dim: 50px;
+  --bomb: url("/images/bomb.png");
+  --flag: url("/images/flag.png");
+  --shovel: url("/images/shovel.png");
+  --menu: url("/images/menu.png");
+  --close: url("/images/close.png");
 }
 
 
 @keyframes Gradient {
-   0% {background-position: 0px 0px}
-   100% {background-position: 2000px 2000px}
+   0% {background-position: 0% 0%}
+   100% {background-position: var(--width) 0%}
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+@font-face {
+  font-family: "Arcade";
+  src: url("arcade.ttf");
+}
+
+.apply-shake {
+  animation: shake 1s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 html, body {
@@ -17,17 +48,44 @@ html, body {
   display: flex;
   margin: 0px;
   padding: 0px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Arcade', sans-serif;
+  font-size: 0.8rem;
   justify-content: center;
   align-items: center;
 }
 
 html {
   background: linear-gradient(90deg,blue 0%, #9F2B68 60%,blue 100%);
-  animation: Gradient 8s linear infinite;
+  background-color: red;
+  animation: Gradient 10s linear infinite;
   background-size: 100% 100%;
+
+  transition: background-color 2s ease;
 }
 
+body #lose {
+  display: none;
+  font-family: 'Arcade', 'Montserrat', sans-serif;
+  font-size: 3.5rem;
+  position: fixed;
+  left: 1rem;
+  color: white;
+  line-height: 1.3;
+  z-index: 7000;
+  text-shadow: 4px 4px blue;
+}
+
+html.gameover {
+  background: black;
+}
+
+body.gameover #grid {
+  opacity: 0.6 !important;
+}
+
+body.gameover #lose {
+  display: block;
+}
 
 p {
   text-align: center;
@@ -52,7 +110,9 @@ p {
   opacity: 0.9;
 }
 
-p:hover {
+
+
+p:not([class="0"]):not(.cover):hover, p.cover:hover {
   transform: scale3d(1.1,1.1,1.3);
   z-index: 900;
 }
@@ -62,11 +122,18 @@ p[class="0"] {
   border: none;
 }
 
+p[class="0"]:not(.cover) {
+  border: 2px solid white !important;
+  opacity: 0.3;
+}
+
 p.bomb {
-  background: url("https://cdn3.iconfinder.com/data/icons/objects/512/Dot-512.png");
+  background: var(--bomb);
   background-size:  var(--dim) var(--dim);
   background-position: center;
   backdrop-filter: invert(100);
+  background-color: yellow;
+  color: transparent;
   border: none;
 }
 
@@ -81,7 +148,7 @@ p.cover {
 }
 
 p.flag {
-  background: url("https://cdn-icons-png.flaticon.com/512/395/395841.png");
+  background: var(--flag);
   border: 4px solid red !important;
   background-size: calc( var(--dim) * 0.6);
   background-repeat: no-repeat;
@@ -91,17 +158,13 @@ p.flag {
 }
 
 p.shovel {
-  background: url("https://cdn-icons-png.flaticon.com/512/1862/1862573.png");
+  background: var(--shovel);
   background-size: calc(var(--dim) * 0.6);
   background-repeat: no-repeat;
   background-color: var(--cover) !important;
   color: transparent !important;
   background-position: center;
   border: 4px solid #ccc !important;
-}
-
-p.cover:hover {
-  border: 4px solid black;
 }
 
 p.cover.hint {
@@ -155,34 +218,41 @@ p[class="5"] {
 }
 
 body.hide #display {
-  transform: translateX(-100vw);
-  opacity: 0;
+  transform: translateY(100vh);
 }
 
 #menu {
   position: fixed;
   left: 0px;
   top: 0px;
-  width: 40px;
-  height: 40px;
-  background: url("https://cdn-icons-png.flaticon.com/512/8165/8165120.png");
+  width: var(--dim);
+  height: var(--dim);
+
+  background: var(--menu);
   background-size: 25px;
   background-color: black !important;
   background-repeat: no-repeat;
   background-position: center;
-  border: 4px solid rgb(159, 43, 104);
+
+  border: 3px solid rgb(159, 43, 104);
+
+  border-top: 0px;
+  border-left: 0px;
+
   z-index: 99999;
-  transition: background-color 0.5s ease;
+  transition: background-color 0.5s, border-width 0.5s, border-color 0.5s;
   cursor: pointer;
 }
 
 #menu:hover {
-  background-color: blue !important;
+  border-color: blue;
 }
 
 body:not(.hide) #menu {
-  background-image: url("https://cdn-icons-png.flaticon.com/512/7782/7782775.png") !important;
+  background-image: var(--close) !important;
   background-size: 18px;
+  border-width: 15px;
+  border-color: blue;
 }
 
 
@@ -191,23 +261,38 @@ body:not(.hide) #menu {
   display: block;
   color: white;
   margin: 1rem;
+  font-size: 1.2rem;
 }
 
 input {
-  width: 200px;
-  padding: 0.3rem;
+  width: 20%;
+  padding: 0.7rem;
   padding-left: 1rem;
-  margin: 0 10px;
+  margin: 10px;
+  margin-top: 0;
+
   background-color: black;
   box-shadow: none;
-  border: 1px solid white;
-  border-radius: 1rem;
-  font-family: 'Montserrat', sans-serif; 
+  
+  border: 3px solid white;
+  
+  font-family: 'Arcade', 'Montserrat', sans-serif;
+  font-size: 1.2rem;
   color: white;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type=number]{
+  -moz-appearance: textfield;
 }
 
 input[type="button"] {
   margin-top: 1rem;
+  padding: 1rem;
   background-color: aqua;
   color: black;
   opacity: 1;
@@ -215,6 +300,20 @@ input[type="button"] {
   border: none;
   box-shadow: 0 0 7px cyan;
 }
+
+#fullscreen {
+  margin-top: 2rem;
+  background-color: orange;
+  box-shadow: 0 0 7px orange;
+}
+
+@media only screen and (max-width: 760px) {
+  input {
+    width: 80% !important;
+  }
+}
+
+
 
 label {
   color: white;
